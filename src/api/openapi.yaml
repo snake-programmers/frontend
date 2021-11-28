@@ -1,0 +1,321 @@
+openapi: 3.0.0
+info:
+  title: StoreFront API
+  version: 0.0.1
+paths:
+  /address/suggest:
+    get:
+      tags:
+        - suggest
+      summary: Suggest address
+      parameters:
+        - name: input
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AddressDto"
+  /userregister:
+    post:
+      operationId: register
+      tags:
+        - register
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RegisterUserDto"
+      responses:
+        '200':
+          description: a
+  /user/info:
+    get:
+      operationId: getUserInfo
+      security:
+        - basicAuth: []
+      tags:
+        - user
+      summary: Get user info
+      responses:
+        '200':
+          description: Desc
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+  /user/orders:
+    get:
+      operationId: getOrders
+      security:
+        - basicAuth: []
+      tags:
+        - user
+      summary: get orders
+      responses:
+        '200':
+          description: Docs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrderDto"
+  /user/products/search:
+    get:
+      operationId: searchProducts
+      security:
+        - basicAuth: []
+      tags:
+        - user
+      summary: search products
+      parameters:
+        - name: q
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Docs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductTypeDto"
+  /user/products/nearest:
+    get:
+      operationId: nearestProducts
+      security:
+        - basicAuth: [ ]
+      tags:
+        - user
+      summary: nearest products
+      parameters:
+        - name: type
+          required: true
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Docs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NearestProductDto"
+  /user/order:
+    post:
+      operationId: addOrder
+      security:
+          - basicAuth: [ ]
+      tags:
+        - user
+      summary: nearest products
+      parameters:
+        - name: mean
+          required: true
+          in: query
+          schema:
+            type: number
+        - name: point
+          required: true
+          in: query
+          schema:
+            type: number
+        - name: lat
+          required: true
+          in: query
+          schema:
+            type: number
+        - name: lon
+          required: true
+          in: query
+          schema:
+            type: number
+        - name: count
+          required: true
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Docs
+  /user/route:
+    post:
+      operationId: route
+      security:
+        - basicAuth: [ ]
+      tags:
+        - user
+      summary: route
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RouteParamsDto"
+      responses:
+        '200':
+          description: Docs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeliveryRoutingDto"
+security:
+  - basicAuth: []
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    AddressDto:
+      type: object
+      properties:
+        name:
+          type: string
+        lat:
+          type: number
+        lon:
+          type: number
+      required: [name, lat, lon]
+    RegisterUserDto:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        lat:
+          type: number
+        lon:
+          type: number
+      required: [email, password, name, address, lat, lon]
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: number
+        email:
+          type: string
+        name:
+          type: string
+        homeAddress:
+          type: string
+        lat:
+          type: number
+        lon:
+          type: number
+      required: [id, email, name, homeAddress, lat, lon]
+    OrderItemDto:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        volume:
+          type: string
+        humanVolume:
+          type: string
+        count:
+          type: number
+      required: [id, name, volume, humanVolume, count]
+    OrderDto:
+      type: object
+      properties:
+        id:
+          type: number
+        deliveredBy:
+          type: string
+        deliveryService:
+          type: string
+        status:
+          type: string
+        count:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItemDto"
+      required: [id, deliveredBy, deliveryService, status, items]
+    ProductTypeDto:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        volume:
+          type: string
+        humanVolume:
+          type: string
+        picture:
+          type: string
+      required: [id, name, volume, humanVolume, picture]
+    NearestProductDto:
+      type: object
+      properties:
+        productId:
+          type: number
+        storeAddress:
+          type: string
+        storeName:
+          type: string
+        storeId:
+          type: number
+        price:
+          type: number
+        distance:
+          type: number
+      required: [productId, storeAddress, storeName, storeId, price, distance]
+    DeliveryRoutingDto:
+      type: object
+      properties:
+        distance:
+          type: number
+        mean:
+          type: string
+        meanId:
+          type: number
+        service:
+          type: string
+        serviceId:
+          type: number
+        pricePerKm:
+          type: number
+        pointId:
+          type: number
+      required: [distance, mean, meanId, service, serviceId, pricePerKm]
+    RouteParamsDto:
+      type: object
+      properties:
+        lat:
+          type: number
+        lon:
+          type: number
+        stores:
+          type: array
+          items:
+            type: number
+      required: [lat, lon, stores]
+
